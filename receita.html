@@ -628,18 +628,18 @@
 
     try {
       // Tenta atualizar (upsert)
-      await sbFetch('checkins', {
-        method: 'POST',
-        prefer: 'return=minimal,resolution=merge-duplicates',
-        headers: { 'Prefer': 'return=minimal,resolution=merge-duplicates' },
-        body: JSON.stringify({
-          receita_id: receitaId,
-          medicamento_index: medIdx,
-          horario,
-          data_checkin: hoje,
-          marcado: novoEstado,
-        }),
-      });
+await sbFetch('checkins?on_conflict=receita_id,medicamento_index,horario,data_checkin', {
+  method: 'POST',
+  prefer: 'return=minimal',
+  headers: { 'Prefer': 'return=minimal,resolution=merge-duplicates' },
+  body: JSON.stringify({
+    receita_id: receitaId,
+    medicamento_index: medIdx,
+    horario,
+    data_checkin: hoje,
+    marcado: novoEstado,
+  }),
+});
 
       toast(novoEstado ? '✓ Marcado como tomado!' : 'Desmarcado.');
     } catch(e) {

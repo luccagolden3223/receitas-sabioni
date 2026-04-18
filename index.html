@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Dr. Vítor Sabioni</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark:  #1a3a6b;
+    --blue-mid:   #1e5bbf;
+    --blue-main:  #2979d4;
+    --blue-light: #3d8ef0;
+    --edge:       rgba(255,255,255,0.15);
+    --edge-light: rgba(255,255,255,0.25);
+    --white:      #ffffff;
+    --white-dim:  rgba(255,255,255,0.75);
+    --white-ghost:rgba(255,255,255,0.45);
+    --grad-body:  linear-gradient(160deg, #1a4db5 0%, #1e5bbf 40%, #2563c7 100%);
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--grad-body);
+    color: var(--white);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .top-bar h1 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .top-bar span {
+    font-size: 13px;
+    color: var(--white-dim);
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--edge);
+    background: rgba(255,255,255,0.08);
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: rgba(255,255,255,0.2);
+    color: var(--white);
+    border-color: var(--edge-light);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── CARD ── */
+  .card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--edge);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--white-ghost);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* ── FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.span2 { grid-column: span 2; }
+
+  label {
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--white-ghost);
+  }
+
+  input, textarea, select {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input::placeholder, textarea::placeholder { color: var(--white-ghost); }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--edge-light);
+    background: rgba(255,255,255,0.15);
+  }
+
+  select option { background: #1e5bbf; color: white; }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* ── MEDICAMENTO BLOCK ── */
+  .med-block {
+    background: rgba(0,0,0,0.15);
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .med-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .med-num-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+  }
+
+  .btn-remove-med {
+    background: rgba(255,80,80,0.15);
+    border: 1px solid rgba(255,80,80,0.3);
+    color: rgba(255,140,140,0.9);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-remove-med:hover { background: rgba(255,80,80,0.25); }
+
+  /* ── HORÁRIOS ── */
+  .horarios-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .horario-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 13px;
+    color: var(--white);
+  }
+
+  .horario-tag button {
+    background: none;
+    border: none;
+    color: var(--white-ghost);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+    width: auto;
+  }
+
+  .horario-input-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .horario-input-wrap input {
+    width: 100px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .btn-add-horario {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: var(--white-dim);
+    font-size: 12px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .btn-add-horario:hover { background: rgba(255,255,255,0.18); }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid var(--edge-light);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover { background: rgba(255,255,255,0.3); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+  .btn-add-med {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── LISTA DE RECEITAS ── */
+  .receita-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.4rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .receita-row-info {}
+  .receita-row-info .nome { font-size: 15px; font-weight: 600; }
+  .receita-row-info .meta { font-size: 12px; color: var(--white-dim); margin-top: 3px; }
+
+  .receita-row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-small:hover { background: rgba(255,255,255,0.2); color: var(--white); }
+
+  /* ── DASHBOARD ── */
+  .resumo-data {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--white-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .dash-paciente {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .dash-paciente-nome {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+
+  .dash-med-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dash-med-nome { font-size: 13px; color: var(--white-dim); }
+
+  .dash-horarios { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .dash-pill {
+    font-size: 11px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+
+  .dash-pill.ok { background: rgba(74,222,170,0.15); color: #4adeaa; border-color: rgba(74,222,170,0.3); }
+  .dash-pill.pendente { background: rgba(255,255,255,0.08); color: var(--white-ghost); border-color: var(--edge); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--edge-light);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+    max-width: 320px;
+    z-index: 999;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── LOADING ── */
+  .loading { text-align: center; color: var(--white-dim); padding: 2rem; font-size: 14px; }
+
+  /* ── EMPTY ── */
+  .empty { text-align: center; color: var(--white-ghost); padding: 3rem; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .field.span2 { grid-column: span 1; }
+    body { padding: 1rem 0.75rem 3rem; }
+    .card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <h1>Dr. Vítor Lopes Sabioni</h1>
+    <span>Painel de Receitas</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('nova')">Nova Receita</button>
+    <button class="tab-btn" onclick="showTab('receitas')">Receitas</button>
+    <button class="tab-btn" onclick="showTab('dashboard')">Dashboard</button>
+  </div>
+
+  <!-- ══ TAB: NOVA RECEITA ══ -->
+  <div class="tab-panel active" id="tab-nova">
+    <div class="card">
+      <div class="card-title">Dados do Paciente</div>
+      <div class="form-grid">
+        <div class="field span2">
+          <label>Nome completo</label>
+          <input type="text" id="pac-nome" placeholder="Ana Paula Souza">
+        </div>
+        <div class="field">
+          <label>Data de nascimento</label>
+          <input type="text" id="pac-nasc" placeholder="14/03/1985">
+        </div>
+        <div class="field">
+          <label>Convênio / CPF</label>
+          <input type="text" id="pac-convenio" placeholder="Unimed — 032.xxx.xxx-12">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Medicamentos</div>
+      <div id="meds-container"></div>
+      <button class="btn-secondary btn-add-med" onclick="addMed()">+ Adicionar Medicamento</button>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="resetForm()">Limpar</button>
+      <button class="btn-primary" onclick="salvarReceita()">Gerar Receita →</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB: RECEITAS ══ -->
+  <div class="tab-panel" id="tab-receitas">
+    <div class="card">
+      <div class="card-title">Receitas Emitidas</div>
+      <div id="lista-receitas"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: DASHBOARD ══ -->
+  <div class="tab-panel" id="tab-dashboard">
+    <div class="card">
+      <div class="card-title">Resumo de Hoje</div>
+      <div class="resumo-data" id="resumo-data"></div>
+      <div id="dashboard-content"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ══ CONFIG SUPABASE ══
+  // Substitua pelos seus valores do Supabase
+  const SUPABASE_URL = 'COLE_SUA_SUPABASE_URL_AQUI';
+  const SUPABASE_KEY = 'COLE_SUA_SUPABASE_ANON_KEY_AQUI';
+
+  // URL base do seu site na Vercel (sem barra no final)
+  const SITE_URL = window.location.origin;
+
+  // ══ SUPABASE HELPERS ══
+  async function sbFetch(path, opts = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': opts.prefer || '',
+        ...opts.headers
+      },
+      ...opts
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  // ══ TABS ══
+  function showTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'receitas') loadReceitas();
+    if (name === 'dashboard') loadDashboard();
+  }
+
+  // ══ TOAST ══
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ══ MEDICAMENTOS ══
+  let medCount = 0;
+  const numerais = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+  const badgeOpcoes = [
+    { value: 'continuo', label: 'Uso contínuo' },
+    { value: 'periodo',  label: 'Por período' },
+    { value: 'eventual', label: 'Se necessário' },
+    { value: 'atencao',  label: 'Antibiótico' },
+  ];
+
+  function addMed() {
+    const idx = medCount++;
+    const container = document.getElementById('meds-container');
+    const div = document.createElement('div');
+    div.className = 'med-block';
+    div.id = `med-${idx}`;
+    div.innerHTML = `
+      <div class="med-block-header">
+        <span class="med-num-label">Medicamento ${numerais[idx] || idx+1}</span>
+        <button class="btn-remove-med" onclick="removeMed(${idx})">Remover</button>
+      </div>
+      <div class="form-grid">
+        <div class="field span2">
+          <label>Nome do medicamento</label>
+          <input type="text" id="m${idx}-nome" placeholder="Losartana Potássica 50mg">
+        </div>
+        <div class="field">
+          <label>Subtítulo (posologia curta)</label>
+          <input type="text" id="m${idx}-sub" placeholder="1 comprimido ao dia · Via oral">
+        </div>
+        <div class="field">
+          <label>Tipo / Badge</label>
+          <select id="m${idx}-badge">
+            ${badgeOpcoes.map(b => `<option value="${b.value}">${b.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Dose</label>
+          <input type="text" id="m${idx}-dose" placeholder="1 comprimido de 50mg">
+        </div>
+        <div class="field">
+          <label>Duração</label>
+          <input type="text" id="m${idx}-duracao" placeholder="Uso contínuo — sem prazo">
+        </div>
+        <div class="field">
+          <label>Forma de uso</label>
+          <input type="text" id="m${idx}-forma" placeholder="Engolir inteiro com água">
+        </div>
+        <div class="field">
+          <label>Indicação (opcional)</label>
+          <input type="text" id="m${idx}-indicacao" placeholder="Febre acima de 37,8°C ou dor">
+        </div>
+        <div class="field span2">
+          <label>Horários</label>
+          <div class="horarios-wrapper" id="m${idx}-horarios-wrap">
+            <div class="horario-input-wrap">
+              <input type="text" id="m${idx}-horario-input" placeholder="ex: 07h ou manhã">
+              <button class="btn-add-horario" onclick="addHorario(${idx})">+ Adicionar</button>
+            </div>
+          </div>
+        </div>
+        <div class="field span2">
+          <label>Orientações do médico</label>
+          <textarea id="m${idx}-obs" placeholder="Tomar sempre no mesmo horário..."></textarea>
+        </div>
+        <div class="field span2">
+          <label>Alerta / Atenção (opcional)</label>
+          <textarea id="m${idx}-alerta" placeholder="Deixe vazio se não houver alerta"></textarea>
+        </div>
+        <div class="field">
+          <label>Link da bula (ANVISA)</label>
+          <input type="text" id="m${idx}-bula" placeholder="https://...">
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+
+  function removeMed(idx) {
+    const el = document.getElementById(`med-${idx}`);
+    if (el) el.remove();
+  }
+
+  function addHorario(idx) {
+    const input = document.getElementById(`m${idx}-horario-input`);
+    const val = input.value.trim();
+    if (!val) return;
+    const wrap = document.getElementById(`m${idx}-horarios-wrap`);
+    const tag = document.createElement('div');
+    tag.className = 'horario-tag';
+    tag.dataset.horario = val;
+    tag.innerHTML = `${val} <button onclick="this.parentElement.remove()">×</button>`;
+    wrap.insertBefore(tag, wrap.querySelector('.horario-input-wrap'));
+    input.value = '';
+  }
+
+  function getMedData(idx) {
+    const el = document.getElementById(`med-${idx}`);
+    if (!el) return null;
+    const horarios = [...el.querySelectorAll('.horario-tag')].map(t => t.dataset.horario);
+    return {
+      nome:     document.getElementById(`m${idx}-nome`)?.value.trim(),
+      sub:      document.getElementById(`m${idx}-sub`)?.value.trim(),
+      badge:    document.getElementById(`m${idx}-badge`)?.value,
+      dose:     document.getElementById(`m${idx}-dose`)?.value.trim(),
+      duracao:  document.getElementById(`m${idx}-duracao`)?.value.trim(),
+      forma:    document.getElementById(`m${idx}-forma`)?.value.trim(),
+      indicacao:document.getElementById(`m${idx}-indicacao`)?.value.trim(),
+      horarios,
+      obs:      document.getElementById(`m${idx}-obs`)?.value.trim(),
+      alerta:   document.getElementById(`m${idx}-alerta`)?.value.trim(),
+      bula:     document.getElementById(`m${idx}-bula`)?.value.trim(),
+    };
+  }
+
+  // ══ SALVAR RECEITA ══
+  async function salvarReceita() {
+    const pacNome = document.getElementById('pac-nome').value.trim();
+    if (!pacNome) { toast('Informe o nome do paciente.'); return; }
+
+    const meds = [];
+    for (let i = 0; i < medCount; i++) {
+      const m = getMedData(i);
+      if (m && m.nome) meds.push(m);
+    }
+    if (meds.length === 0) { toast('Adicione ao menos um medicamento.'); return; }
+
+    const hoje = new Date();
+    const dataFormatada = hoje.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const num = `#${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}${String(hoje.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`;
+    const validade = new Date(hoje.getTime() + 30*24*60*60*1000).toLocaleDateString('pt-BR');
+
+    const payload = {
+      paciente_nome:        pacNome,
+      paciente_nascimento:  document.getElementById('pac-nasc').value.trim(),
+      paciente_convenio:    document.getElementById('pac-convenio').value.trim(),
+      data_emissao:         dataFormatada,
+      numero_receita:       num,
+      validade,
+      medicamentos:         meds,
+    };
+
+    try {
+      const result = await sbFetch('receitas', {
+        method: 'POST',
+        prefer: 'return=representation',
+        body: JSON.stringify(payload),
+      });
+      const id = result[0].id;
+      const link = `${SITE_URL}/receita.html?id=${id}`;
+      await navigator.clipboard.writeText(link).catch(() => {});
+      toast(`✓ Receita gerada! Link copiado: ${link}`);
+      resetForm();
+    } catch(e) {
+      toast('Erro ao salvar: ' + e.message);
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('pac-nome').value = '';
+    document.getElementById('pac-nasc').value = '';
+    document.getElementById('pac-convenio').value = '';
+    document.getElementById('meds-container').innerHTML = '';
+    medCount = 0;
+    addMed();
+  }
+
+  // ══ LISTA DE RECEITAS ══
+  async function loadReceitas() {
+    const el = document.getElementById('lista-receitas');
+    el.innerHTML = '<div class="loading">Carregando...</div>';
+    try {
+      const data = await sbFetch('receitas?select=id,paciente_nome,data_emissao,numero_receita&order=created_at.desc');
+      if (!data || data.length === 0) {
+        el.innerHTML = '<div class="empty">Nenhuma receita ainda.</div>';
+        return;
+      }
+      el.innerHTML = data.map(r => `
+        <div class="receita-row">
+          <div class="receita-row-info">
+            <div class="nome">${r.paciente_nome}</div>
+            <div class="meta">${r.numero_receita} &nbsp;·&nbsp; ${r.data_emissao}</div>
+          </div>
+          <div class="receita-row-actions">
+            <button class="btn-small" onclick="copiarLink('${r.id}')">Copiar Link</button>
+            <a class="btn-small" href="receita.html?id=${r.id}" target="_blank">Ver</a>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {
+      el.innerHTML = `<div class="empty">Erro: ${e.message}</div>`;
+    }
+  }
+
+  function copiarLink(id) {
+    const link = `${SITE_URL}/receita.html?id=${id}`;
+    navigator.clipboard.writeText(link).then(() => toast('Link copiado!')).catch(() => {
+      prompt('Copie o link:', link);
+    });
+  }
+
+  // ══ DASHBOARD ══
+  async function loadDashboard() {
+    const el = document.getElementById('dashboard-content');
+    const dataEl = document.getElementById('resumo-data');
+    el.innerHTML = '<div class="loading">Carregando...</div>';
+
+    const hoje = new Date().toISOString().slice(0,10);
+    dataEl.textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    try {
+      const receitas = await sbFetch('receitas?select=id,paciente_nome,medicamentos&order=created_at.desc');
+      const checkins = await sbFetch(`checkins?data_checkin=eq.${hoje}&select=receita_id,medicamento_index,horario,marcado`);
+
+      if (!receitas || receitas.length === 0) {
+        el.innerHTML = '<div class="empty">Nenhuma receita cadastrada.</div>';
+        return;
+      }
+
+      const checkinMap = {};
+      (checkins || []).forEach(c => {
+        const key = `${c.receita_id}-${c.medicamento_index}-${c.horario}`;
+        checkinMap[key] = c.marcado;
+      });
+
+      el.innerHTML = receitas.map(r => {
+        const meds = r.medicamentos || [];
+        const medsHtml = meds.map((m, i) => {
+          const horarios = m.horarios || [];
+          const horariosHtml = horarios.length > 0
+            ? horarios.map(h => {
+                const key = `${r.id}-${i}-${h}`;
+                const ok = checkinMap[key];
+                return `<span class="dash-pill ${ok ? 'ok' : 'pendente'}">${h}${ok ? ' ✓' : ''}</span>`;
+              }).join('')
+            : '<span class="dash-pill pendente">sem horário</span>';
+          return `
+            <div class="dash-med-row">
+              <span class="dash-med-nome">${m.nome || '—'}</span>
+              <div class="dash-horarios">${horariosHtml}</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="dash-paciente">
+            <div class="dash-paciente-nome">${r.paciente_nome}</div>
+            ${medsHtml || '<div class="dash-med-row"><span class="dash-med-nome">Sem medicamentos</span></div>'}
+          </div>
+        `;
+      }).join('');
+
+    } catch(e) {
+      el.innerHTML = `<div class="empty">Erro: ${e.message}</div>`;
+    }
+  }
+
+  // ══ INIT ══
+  addMed();
+</script>
+</body>
+</html>
